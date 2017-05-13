@@ -1,3 +1,4 @@
+import forismatic.Forismatic;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -13,14 +14,24 @@ public class ComeOnDudeBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         Random r = new Random();
         String msg = update.getMessage().getText();
+
         // We check if the update has a message and the message has text
         if (update.hasMessage() && update.getMessage().hasText()) {
+
             SendMessage message = new SendMessage()
                     .enableMarkdown(true)
                     .setChatId(update.getMessage().getChatId());
 //
-            if(msg.equals("/getphrase") || msg.equals("Кто твой создатель?")){
-                message.setText(s[r.nextInt(9)]);
+            if(msg.equals("/getphrase")){
+                Forismatic.Quote q = new Forismatic().getQuote();
+                if(!q.getQuoteAuthor().equals(null) && !q.getQuoteText().equals(null)) {
+                    message.setText(q.getQuoteText() + "\n" + q.getQuoteAuthor() + "\n\n"
+                            + "via forismatic.com");
+                }else if(q.getQuoteAuthor().equals(null)){
+                    message.setText(q.getQuoteText() + "\n"
+                            + "via forismatic.com");
+                }
+
             }else if(msg.equals("/help")){
                 message.setText("/getphrase - прислать какую-либо фразу" + "\n"
                                     + "/gettime - подстказать время" + "\n"
